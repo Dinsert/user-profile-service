@@ -1,0 +1,85 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.0.1'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.openapi.generator' version '7.5.0'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+description = 'Service for storing additional information about users'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-flyway'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.flywaydb:flyway-database-postgresql'
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.22'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor "org.mapstruct:mapstruct-processor:1.5.5.Final"
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-flyway-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+openApiGenerate {
+    generatorName = "spring"
+
+    inputSpec = layout.projectDirectory
+            .file("src/main/resources/openapi/openapi.yml")
+            .asFile
+            .path
+
+    outputDir = layout.buildDirectory
+            .dir("generated")
+            .get()
+            .asFile
+            .path
+
+    apiPackage = "com.example.userprofile.api"
+    modelPackage = "com.example.userprofile.api.dto"
+
+    configOptions = [
+            interfaceOnly  : "true",
+            useSpringBoot3 : "true",
+            useTags        : "true",
+            openApiNullable: "false"
+    ]
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir layout.buildDirectory
+                    .dir("generated/src/main/java")
+                    .get()
+                    .asFile
+        }
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
