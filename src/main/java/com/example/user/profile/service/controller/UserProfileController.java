@@ -21,8 +21,14 @@ public class UserProfileController implements UserProfileApi {
     }
 
     @Override
-    public ResponseEntity<Void> upsertUserProfile(UUID userId, UserProfileDto userProfileDto) {
-        userProfileService.upsertUserProfile(userId, userProfileDto);
+    public ResponseEntity<Void> createUserProfile(UUID userId, UserProfileDto userProfileDto) {
+        userProfileService.createUserProfile(userId, userProfileDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> updateUserProfile(UUID userId, UserProfileDto userProfileDto) {
+        userProfileService.updateUserProfile(userId, userProfileDto);
         return ResponseEntity.ok().build();
     }
 }

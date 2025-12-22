@@ -1,4 +1,4 @@
-package com.example.user.profile.service.congig;
+package com.example.user.profile.service.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -36,13 +36,24 @@ public class UserProfileServiceImpl implements UserProfileService {
         return userProfileMapper.toDto(userProfile);
     }
 
-    @CacheEvict(value = "user_profiles", key = "#userId")
     @Transactional
     @Override
-    public void upsertUserProfile(UUID userId, UserProfileDto dto) {
-        log.info("DB call for upsert user profile {}", userId);
+    public void createUserProfile(UUID userId, UserProfileDto dto) {
+        log.info("DB call for create user profile {}", userId);
         UserProfile profile = userProfileMapper.toEntity(dto);
         profile.setUserId(userId);
         userProfileRepository.save(profile);
+    }
+
+    @CacheEvict(value = "user_profiles", key = "#userId")
+    @Transactional
+    @Override
+    public void updateUserProfile(UUID userId, UserProfileDto dto) {
+        log.info("DB call for update user profile {}", userId);
+        UserProfile userProfile = userProfileRepository.findById(userId).orElseThrow(() -> {
+            log.warn("User profile not found:{}", userId);
+            return new UserProfileNotFoundException("User profile not found:" + userId);
+        });
+        userProfileMapper.updateEntityFromDto(dto, userProfile);
     }
 }

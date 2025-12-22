@@ -5,6 +5,7 @@ import com.example.userprofile.api.dto.UserProfileDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface UserProfileMapper {
@@ -14,4 +15,5 @@ public interface UserProfileMapper {
     @Mapping(target = "userId", ignore = true)
     UserProfile toEntity(UserProfileDto dto);
 
+    void updateEntityFromDto(UserProfileDto dto, @MappingTarget UserProfile userProfile);
 }

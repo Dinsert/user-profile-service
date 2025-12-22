@@ -8,5 +8,7 @@ public interface UserProfileService {
 
     UserProfileDto getUserProfile(UUID userId);
 
-    void upsertUserProfile(UUID userId, UserProfileDto userProfileDto);
+    void createUserProfile(UUID userId, UserProfileDto userProfileDto);
+
+    void updateUserProfile(UUID userId, UserProfileDto userProfileDto);
 }
