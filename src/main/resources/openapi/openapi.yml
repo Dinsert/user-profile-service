@@ -1,0 +1,89 @@
+openapi: 3.0.3
+
+info:
+  title: User Profile Service API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8081
+
+paths:
+  /api/user-profiles/{userId}:
+    get:
+      tags:
+        - UserProfile
+      operationId: getUserProfile
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User profile found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileDto'
+        '404':
+          description: User profile not found
+
+    post:
+      tags:
+        - UserProfile
+      operationId: createUserProfile
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileDto'
+      responses:
+        '200':
+          description: User profile successfully created
+
+    put:
+      tags:
+        - UserProfile
+      operationId: updateUserProfile
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileDto'
+      responses:
+        '200':
+          description: User profile successfully updated
+
+components:
+  schemas:
+    UserProfileDto:
+      type: object
+      required:
+        - loyaltyLevel
+        - externalBalance
+      properties:
+        loyaltyLevel:
+          type: string
+          example: GOLD
+        externalBalance:
+          type: number
+          format: bigdecimal
+          example: 1250.50

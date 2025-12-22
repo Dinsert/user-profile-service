@@ -32,6 +32,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.flywaydb:flyway-database-postgresql'
     implementation 'io.swagger.core.v3:swagger-annotations:2.2.22'
+    implementation "org.mapstruct:mapstruct:1.5.5.Final"
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor "org.mapstruct:mapstruct-processor:1.5.5.Final"
