@@ -1,12 +1,10 @@
 package com.example.user.profile.service.config;
 
-import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
-@EnableCaching
+@TestConfiguration
 public class TestCacheConfig {
 
     @Bean
