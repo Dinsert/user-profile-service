@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = UserProfileController.class)
@@ -69,8 +69,7 @@ class UserProfileControllerTest {
 
         mockMvc.perform(get(uri, userId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.loyaltyLevel").value(dto.getLoyaltyLevel()))
-                .andExpect(jsonPath("$.externalBalance").value(dto.getExternalBalance()));
+                .andExpect(content().json(objectMapper.writeValueAsString(dto)));
     }
 
     @Test
