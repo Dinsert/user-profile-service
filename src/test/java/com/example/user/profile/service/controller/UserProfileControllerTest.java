@@ -29,20 +29,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserProfileControllerTest {
 
     @MockitoBean
-    private UserProfileService userProfileService;
+    UserProfileService userProfileService;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    ObjectMapper objectMapper;
 
     @Autowired
-    private MockMvc mockMvc;
+    MockMvc mockMvc;
 
     @MockitoBean
-    private CacheManager cacheManager;
+    CacheManager cacheManager;
 
-    private UUID userId;
+    UUID userId;
 
-    private final String uri = "/api/user-profiles/{userId}";
+    final String uri = "/api/user-profiles/{userId}";
 
     @TestConfiguration
     static class JacksonTestConfig {
