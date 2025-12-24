@@ -1,20 +1,17 @@
 package com.example.user.profile.service.controller;
 
+import com.example.user.profile.service.config.BaseWebMvcTest;
+import com.example.user.profile.service.config.TestCacheConfig;
+import com.example.user.profile.service.exception.UserProfileNotFoundException;
 import com.example.user.profile.service.service.UserProfileService;
 import com.example.user.profile.service.util.UserProfileFixture;
 import com.example.userprofile.api.dto.UserProfileDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.cache.CacheManager;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
@@ -25,35 +22,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Import(TestCacheConfig.class)
 @WebMvcTest(controllers = UserProfileController.class)
-class UserProfileControllerTest {
+class UserProfileControllerTest extends BaseWebMvcTest {
 
     @MockitoBean
     UserProfileService userProfileService;
 
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
-    MockMvc mockMvc;
-
-    @MockitoBean
-    CacheManager cacheManager;
-
     UUID userId;
 
     final String uri = "/api/user-profiles/{userId}";
-
-    @TestConfiguration
-    static class JacksonTestConfig {
-
-        @Bean
-        ObjectMapper objectMapper() {
-            return JsonMapper.builder()
-                    .findAndAddModules()
-                    .build();
-        }
-    }
 
     @BeforeEach
     void setUp() {
@@ -70,6 +48,15 @@ class UserProfileControllerTest {
         mockMvc.perform(get(uri, userId))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(dto)));
+    }
+
+    @Test
+    void getUserProfile_shouldReturn404() throws Exception {
+        when(userProfileService.getUserProfile(userId))
+                .thenThrow(new UserProfileNotFoundException("User profile not found:" + userId));
+
+        mockMvc.perform(get(uri, userId))
+                .andExpect(status().isNotFound());
     }
 
     @Test
