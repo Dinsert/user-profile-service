@@ -87,3 +87,31 @@ components:
           type: number
           format: bigdecimal
           example: 1250.50
+
+    ErrorResponseDTO:
+      type: object
+      description: DTO для представления ошибки в ответе API
+      required:
+        - timestamp
+        - status
+        - error
+        - message
+        - path
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: Время возникновения ошибки в формате ISO 8601
+          example: "2025-05-08T12:34:56Z"
+        status:
+          type: integer
+          format: int32
+          description: HTTP-статус ошибки
+          example: 400
+        message:
+          type: string
+          description: Подробное сообщение об ошибке
+        path:
+          type: string
+          description: Путь запроса, вызвавшего ошибку
+          example: "/users/me"
