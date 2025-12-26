@@ -1,4 +1,4 @@
-package com.example.user.profile.service.config;
+package com.example.user.profile.service.service;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;

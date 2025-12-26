@@ -1,5 +1,6 @@
-package com.example.user.profile.service.config;
+package com.example.user.profile.service.controller;
 
+import com.example.user.profile.service.config.TestJacksonConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;

@@ -1,8 +1,8 @@
 package com.example.user.profile.service.service;
 
 import com.example.user.profile.service.UserProfileServiceApplication;
-import com.example.user.profile.service.config.BaseIntegrationTest;
 import com.example.user.profile.service.config.TestCacheConfig;
+import com.example.user.profile.service.exception.UserProfileNotFoundException;
 import com.example.user.profile.service.repository.UserProfileRepository;
 import com.example.user.profile.service.util.UserProfileFixture;
 import com.example.userprofile.api.dto.UserProfileDto;
@@ -16,6 +16,7 @@ import org.springframework.cache.CacheManager;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest(classes = {UserProfileServiceApplication.class, TestCacheConfig.class})
 class UserProfileServiceIT extends BaseIntegrationTest {
@@ -68,5 +69,15 @@ class UserProfileServiceIT extends BaseIntegrationTest {
         userProfileService.updateUserProfile(userId, dtoForUpdate);
 
         assertThat(cacheManager.getCache(CACHE).get(userId)).isNull();
+    }
+
+    @Test
+    void getUserProfile_shouldThrowUserProfileNotFoundException() {
+        UUID notExistingId = UUID.randomUUID();
+
+        assertThatThrownBy(() -> userProfileService.getUserProfile(notExistingId))
+                .isInstanceOf(UserProfileNotFoundException.class)
+                .hasMessageContaining("User profile not found:")
+                .hasMessageContaining(notExistingId.toString());
     }
 }

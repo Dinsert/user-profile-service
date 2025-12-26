@@ -1,6 +1,5 @@
 package com.example.user.profile.service.controller;
 
-import com.example.user.profile.service.config.BaseWebMvcTest;
 import com.example.user.profile.service.config.TestCacheConfig;
 import com.example.user.profile.service.exception.UserProfileNotFoundException;
 import com.example.user.profile.service.service.UserProfileService;
