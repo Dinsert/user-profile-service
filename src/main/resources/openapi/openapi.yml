@@ -115,3 +115,19 @@ components:
           type: string
           description: Путь запроса, вызвавшего ошибку
           example: "/users/me"
+
+    UserProfileCreatedEvent:
+      type: object
+      required:
+        - userId
+        - loyaltyLevel
+        - externalBalance
+      properties:
+        userId:
+          type: string
+          format: uuid
+        loyaltyLevel:
+          type: string
+        externalBalance:
+          type: number
+          format: bigdecimal

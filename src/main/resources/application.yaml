@@ -1,26 +1,12 @@
 spring:
   application:
     name: user-profile-service
+
   datasource:
     username: postgres
     password: 123456
     url: jdbc:postgresql://localhost:5433/postgres
     driver-class-name: org.postgresql.Driver
-  cache:
-    type: redis
-  data:
-    redis:
-      host: localhost
-      port: 6380
-
-  redis:
-    timeout: 2s
-
-cache:
-  ttl: 1h
-
-server:
-  port: 8081
 
   jpa:
     hibernate:
@@ -28,3 +14,24 @@ server:
 
   flyway:
     default-schema: app
+
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6380
+  redis:
+    timeout: 2s
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: user-profile-service
+      auto-offset-reset: earliest
+
+cache:
+  ttl: 1h
+
+server:
+  port: 8081
