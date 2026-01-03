@@ -116,18 +116,28 @@ components:
           description: Путь запроса, вызвавшего ошибку
           example: "/users/me"
 
-    UserProfileCreatedEvent:
+    UserProfileEvent:
       type: object
       required:
+        - eventId
         - userId
-        - loyaltyLevel
-        - externalBalance
+        - payload
+        - eventType
       properties:
+        eventId:
+          type: string
+          format: uuid
         userId:
           type: string
           format: uuid
-        loyaltyLevel:
-          type: string
-        externalBalance:
-          type: number
-          format: bigdecimal
+          description: User identifier
+        payload:
+          $ref: '#/components/schemas/UserProfileDto'
+        eventType:
+          $ref: '#/components/schemas/UserProfileEventType'
+
+    UserProfileEventType:
+      type: string
+      enum:
+        - CREATED
+        - UPDATED

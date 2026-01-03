@@ -29,6 +29,10 @@ spring:
     consumer:
       group-id: user-profile-service
       auto-offset-reset: earliest
+      enable-auto-commit: false
+      isolation-level: read_committed
+    producer:
+      transaction-id-prefix: user-profile-dlq-
 
 cache:
   ttl: 1h
