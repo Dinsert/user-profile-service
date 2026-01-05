@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Slf4j
@@ -19,7 +18,6 @@ public class UserProfileEventListener {
     private final ObjectMapper objectMapper;
     private final UserProfileEventDispatcher dispatcher;
 
-    @Transactional
     @KafkaListener(topics = USER_PROFILE_EVENTS)
     public void listen(String message) throws Exception {
         log.info("Received event: {}", message);
