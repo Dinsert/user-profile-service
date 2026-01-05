@@ -7,5 +7,6 @@ create TABLE IF NOT EXISTS app.user_profiles (
 );
 
 create TABLE IF NOT EXISTS app.inbox_events (
-    id UUID PRIMARY KEY
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL
 );

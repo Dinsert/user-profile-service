@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+
 @Component
 @RequiredArgsConstructor
 public class UserProfileCreatedHandler implements UserProfileEventHandler {
@@ -33,6 +35,6 @@ public class UserProfileCreatedHandler implements UserProfileEventHandler {
                 event.getPayload()
         );
 
-        inboxEventRepository.save(new InboxEvent(event.getEventId()));
+        inboxEventRepository.save(new InboxEvent(event.getEventId(), Instant.now()));
     }
 }
