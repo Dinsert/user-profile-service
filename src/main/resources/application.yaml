@@ -31,8 +31,24 @@ spring:
       auto-offset-reset: earliest
       enable-auto-commit: false
       isolation-level: read_committed
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.example.userprofile.api.dto
+        spring.json.value.default.type: com.example.userprofile.api.dto.UserProfileEvent
     producer:
       transaction-id-prefix: user-profile-dlq-
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      properties:
+        spring.json.trusted.packages: com.example.userprofile.api.dto
+
+logging:
+  level:
+    org.springframework.kafka.listener.DefaultErrorHandler: OFF
+    org.springframework.kafka.listener.KafkaMessageListenerContainer: OFF
+    org.springframework.kafka.listener.SeekUtils: OFF
+    org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter: OFF
 
 cache:
   ttl: 1h

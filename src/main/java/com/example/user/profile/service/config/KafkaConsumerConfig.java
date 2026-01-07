@@ -1,8 +1,9 @@
 package com.example.user.profile.service.config;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.userprofile.api.dto.UserProfileEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.errors.SerializationException;
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,22 +21,16 @@ import org.springframework.util.backoff.FixedBackOff;
 @Configuration
 public class KafkaConsumerConfig {
 
+    private static final long BACKOFF_INTERVAL_MS = 1_000L;
+    private static final long MAX_RETRIES = 3L;
+
     @Bean
-    public KafkaTemplate<String, String> dlqKafkaTemplate(ProducerFactory<String, String> pf) {
+    public KafkaTemplate<String, Object> dlqKafkaTemplate(ProducerFactory<String, Object> pf) {
         return new KafkaTemplate<>(pf);
     }
 
     @Bean
-    public ConsumerFactory<String, String> consumerFactory(
-            KafkaProperties kafkaProperties
-    ) {
-        return new DefaultKafkaConsumerFactory<>(
-                kafkaProperties.buildConsumerProperties()
-        );
-    }
-
-    @Bean
-    public DefaultErrorHandler errorHandler(KafkaTemplate<String, String> kafkaTemplate) {
+    public DefaultErrorHandler errorHandler(KafkaTemplate<String, Object> kafkaTemplate) {
         DeadLetterPublishingRecoverer recoverer =
                 new DeadLetterPublishingRecoverer(
                         kafkaTemplate,
@@ -49,36 +44,86 @@ public class KafkaConsumerConfig {
         DefaultErrorHandler handler =
                 new DefaultErrorHandler(
                         recoverer,
-                        new FixedBackOff(1000L, 3)
+                        new FixedBackOff(BACKOFF_INTERVAL_MS, MAX_RETRIES)
                 );
 
         handler.addNotRetryableExceptions(
                 IllegalArgumentException.class,
-                JsonProcessingException.class
+                SerializationException.class
         );
 
         handler.setRetryListeners((record, ex, deliveryAttempt) -> {
-            log.error(
-                    "Retry {} for record {} due to {}",
-                    deliveryAttempt,
-                    record,
-                    ex.getMessage(),
-                    ex
-            );
-        });
+            long totalAttempts = MAX_RETRIES + 1;
 
+            Throwable cause = ex;
+            if (cause.getCause() != null) {
+                cause = cause.getCause();
+            }
+
+            UserProfileEvent event = null;
+            Object value = record.value();
+            if (value instanceof UserProfileEvent e) {
+                event = e;
+            }
+
+            String eventId = event != null && event.getEventId() != null
+                    ? event.getEventId().toString()
+                    : "n/a";
+            String eventType = event != null && event.getEventType() != null
+                    ? event.getEventType().name()
+                    : "n/a";
+            String userId = event != null && event.getUserId() != null
+                    ? event.getUserId().toString()
+                    : "n/a";
+
+            if (deliveryAttempt < totalAttempts) {
+                log.warn(
+                        "Retry {}/{} for record topic={}, partition={}, offset={}, key={}, eventId={}, eventType={}, userId={}, reason={}",
+                        deliveryAttempt,
+                        totalAttempts,
+                        record.topic(),
+                        record.partition(),
+                        record.offset(),
+                        record.key(),
+                        eventId,
+                        eventType,
+                        userId,
+                        cause.toString()
+                );
+            } else {
+                log.error(
+                        "DLQ: record failed after {} attempts. topic={}, partition={}, offset={}, key={}, eventId={}, eventType={}, userId={}, reason={}",
+                        deliveryAttempt,
+                        record.topic(),
+                        record.partition(),
+                        record.offset(),
+                        record.key(),
+                        eventId,
+                        eventType,
+                        userId,
+                        cause.toString()
+                );
+            }
+        });
         return handler;
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String>
-    kafkaListenerContainerFactory(DefaultErrorHandler errorHandler,
-                                  ConsumerFactory<String, String> consumerFactory,
-                                  KafkaTransactionManager<String, String> kafkaTransactionManager) {
-        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setCommonErrorHandler(errorHandler);
+    public ConcurrentKafkaListenerContainerFactory<String, UserProfileEvent> kafkaListenerContainerFactory(
+            KafkaProperties kafkaProperties,
+            DefaultErrorHandler errorHandler,
+            KafkaTransactionManager<String, String> kafkaTransactionManager) {
+
+        ConsumerFactory<String, UserProfileEvent> consumerFactory =
+                new DefaultKafkaConsumerFactory<>(kafkaProperties.buildConsumerProperties());
+
+        ConcurrentKafkaListenerContainerFactory<String, UserProfileEvent> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+
         factory.setConsumerFactory(consumerFactory);
+        factory.setCommonErrorHandler(errorHandler);
         factory.getContainerProperties().setKafkaAwareTransactionManager(kafkaTransactionManager);
+
         return factory;
     }
 }

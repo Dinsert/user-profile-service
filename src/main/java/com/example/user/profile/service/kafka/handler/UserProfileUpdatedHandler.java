@@ -1,6 +1,5 @@
 package com.example.user.profile.service.kafka.handler;
 
-import com.example.user.profile.service.model.InboxEvent;
 import com.example.user.profile.service.repository.InboxEventRepository;
 import com.example.user.profile.service.service.UserProfileService;
 import com.example.userprofile.api.dto.UserProfileEvent;
@@ -26,15 +25,11 @@ public class UserProfileUpdatedHandler implements UserProfileEventHandler {
     @Transactional
     @Override
     public void handle(UserProfileEvent event) {
-        if (inboxEventRepository.existsById(event.getEventId())) {
+        int inserted = inboxEventRepository.insertIgnore(event.getEventId(), Instant.now());
+        if (inserted == 0) {
             return;
         }
 
-        userProfileService.updateUserProfile(
-                event.getUserId(),
-                event.getPayload()
-        );
-
-        inboxEventRepository.save(new InboxEvent(event.getEventId(), Instant.now()));
+        userProfileService.updateUserProfile(event.getUserId(), event.getPayload());
     }
 }
