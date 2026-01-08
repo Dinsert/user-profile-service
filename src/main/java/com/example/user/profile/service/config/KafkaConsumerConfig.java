@@ -12,6 +12,7 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
@@ -49,7 +50,8 @@ public class KafkaConsumerConfig {
 
         handler.addNotRetryableExceptions(
                 IllegalArgumentException.class,
-                SerializationException.class
+                SerializationException.class,
+                IllegalStateException.class
         );
 
         handler.setRetryListeners((record, ex, deliveryAttempt) -> {
@@ -123,6 +125,7 @@ public class KafkaConsumerConfig {
         factory.setConsumerFactory(consumerFactory);
         factory.setCommonErrorHandler(errorHandler);
         factory.getContainerProperties().setKafkaAwareTransactionManager(kafkaTransactionManager);
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
 
         return factory;
     }

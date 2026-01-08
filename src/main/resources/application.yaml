@@ -55,3 +55,8 @@ cache:
 
 server:
   port: 8081
+
+app:
+  kafka:
+    topics:
+      user-profile-events: user-profile-events
