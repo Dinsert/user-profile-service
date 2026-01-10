@@ -115,3 +115,29 @@ components:
           type: string
           description: Путь запроса, вызвавшего ошибку
           example: "/users/me"
+
+    UserProfileEvent:
+      type: object
+      required:
+        - eventId
+        - userId
+        - payload
+        - eventType
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+          description: User identifier
+        payload:
+          $ref: '#/components/schemas/UserProfileDto'
+        eventType:
+          $ref: '#/components/schemas/UserProfileEventType'
+
+    UserProfileEventType:
+      type: string
+      enum:
+        - CREATED
+        - UPDATED

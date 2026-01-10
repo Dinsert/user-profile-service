@@ -1,26 +1,12 @@
 spring:
   application:
     name: user-profile-service
+
   datasource:
     username: postgres
     password: 123456
     url: jdbc:postgresql://localhost:5433/postgres
     driver-class-name: org.postgresql.Driver
-  cache:
-    type: redis
-  data:
-    redis:
-      host: localhost
-      port: 6380
-
-  redis:
-    timeout: 2s
-
-cache:
-  ttl: 1h
-
-server:
-  port: 8081
 
   jpa:
     hibernate:
@@ -28,3 +14,48 @@ server:
 
   flyway:
     default-schema: app
+
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6380
+  redis:
+    timeout: 2s
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: user-profile-service
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.example.userprofile.api.dto
+        spring.json.value.default.type: com.example.userprofile.api.dto.UserProfileEvent
+    producer:
+      transaction-id-prefix: user-profile-dlq-
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      properties:
+        spring.json.trusted.packages: com.example.userprofile.api.dto
+
+logging:
+  level:
+    org.springframework.kafka.listener.DefaultErrorHandler: OFF
+    org.springframework.kafka.listener.KafkaMessageListenerContainer: OFF
+    org.springframework.kafka.listener.SeekUtils: OFF
+    org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter: OFF
+
+cache:
+  ttl: 1h
+
+server:
+  port: 8081
+
+app:
+  kafka:
+    topics:
+      user-profile-events: user-profile-events
