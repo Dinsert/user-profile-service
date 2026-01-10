@@ -30,7 +30,6 @@ spring:
       group-id: user-profile-service
       auto-offset-reset: earliest
       enable-auto-commit: false
-      isolation-level: read_committed
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
       properties:
